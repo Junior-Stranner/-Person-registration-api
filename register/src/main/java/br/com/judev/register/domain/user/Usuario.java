@@ -38,7 +38,6 @@ public class Usuario {
         this.estado = estado;
     }
 
-
     public Usuario() {
     }
 
