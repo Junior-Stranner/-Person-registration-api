@@ -27,29 +27,20 @@ public class EnderecoService {
         validarDadosObrigatoriosEnderecos(endereco);
         return enderecoRepository.save(endereco);
     }
-
     private void validarDadosObrigatoriosEnderecos(Endereco endereco) {
-        // Validação do logradouro
+
         if (endereco.getLogradouro() == null || endereco.getLogradouro().isBlank()) {
             throw new IllegalArgumentException("O logradouro é obrigatório.");
         }
-
-        // Validação do CEP
         if (endereco.getCep() == null || endereco.getCep().isBlank()) {
             throw new IllegalArgumentException("O CEP é obrigatório.");
         }
-
-        // Validação do número
         if (endereco.getNumero() == 0) {
             throw new IllegalArgumentException("O número é obrigatório.");
         }
-
-        // Validação da cidade
         if (endereco.getCidade() == null || endereco.getCidade().isBlank()) {
             throw new IllegalArgumentException("A cidade é obrigatória.");
         }
-
-        // Validação do estado
         if (endereco.getEstado() == null || endereco.getEstado().isBlank()) {
             throw new IllegalArgumentException("O estado é obrigatório.");
         }

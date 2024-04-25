@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 
 @RestController
-@RequestMapping("/api/v1/persons")
+@RequestMapping("/api/v1/pessoas")
 @Tag(name = "Persons" , description = "endpoints for Persons")
 public class PessoaController {
     
@@ -34,7 +34,7 @@ public class PessoaController {
     }
 
     
-    @Operation(summary = "Criar um novo usuário", description = "Recurso para criar um novo usuário",
+    @Operation(summary = "Criar um novo pessoa", description = "Recurso para criar um novo pessoa",
     responses = {
             @ApiResponse(responseCode = "200", description = "Recurso criado com sucesso",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = Pessoa.class))),
