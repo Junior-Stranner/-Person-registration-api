@@ -54,5 +54,29 @@ public class EnderecoService {
         return endereco;
     }
 
+    @Transactional // Indica que este método modifica o banco de dados
+    public Endereco alterarEndereco(Endereco endereco, Long id) {
+        validarDadosObrigatoriosEnderecos(endereco); // Certifica-se de que a pessoa tem dados válidos
 
+        // Busca a pessoa existente pelo ID e lança exceção se não for encontrada
+        Endereco enderecoExistente = enderecoRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("Pessoa com ID " + id + " não encontrada."));
+
+        // Atualiza os campos da pessoa existente com os novos dados
+       enderecoExistente.setLogradouro(endereco.getLogradouro());
+       enderecoExistente.setCep(endereco.getCep());
+       enderecoExistente.setNumero(endereco.getNumero());
+       enderecoExistente.setCidade(endereco.getCidade());
+       enderecoExistente.setEstado(endereco.getEstado());
+
+        return enderecoRepository.save(enderecoExistente); // Salva as alterações no banco de dados
+    }
+
+    @Transactional // Indica que este método modifica o banco de dados
+    public void deletarEndereco(Long id) {
+        Endereco endereco = enderecoRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("Pessoa com ID " + id +"não encontrada.")); // Lança exceção se o ID não for encontrado
+
+        enderecoRepository.delete(endereco); // Exclui a pessoa do banco de dados
+    }
 }
