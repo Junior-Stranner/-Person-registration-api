@@ -1,4 +1,4 @@
-package br.com.judev.register.Controller;
+package br.com.judev.register.controller;
 
 import java.util.List;
 

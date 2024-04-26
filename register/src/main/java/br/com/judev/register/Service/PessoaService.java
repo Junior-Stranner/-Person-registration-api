@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.judev.register.Repository.PessoaRepository;
+import br.com.judev.register.repository.PessoaRepository;
 import br.com.judev.register.domain.person.Pessoa;
 
 @Service
@@ -29,7 +29,6 @@ public class PessoaService {
         validarDadosObrigatorios(pessoa);
         return pessoaRepository.save(pessoa);
     }
-
     private void validarDadosObrigatorios(Pessoa pessoa) {
 
         if (pessoa.getNomeCompleto() == null || pessoa.getNomeCompleto().isBlank()) {
@@ -42,4 +41,11 @@ public class PessoaService {
                 throw new IllegalArgumentException("Endereço é obrigatório");
             }
         }
+
+    public Pessoa buscarPorId(Long id) {
+        Pessoa pessoa = pessoaRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("Pessoa com ID " + id + " não encontrada."));
+        validarDadosObrigatorios(pessoa);
+        return pessoa;
+    }
 }

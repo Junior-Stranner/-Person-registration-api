@@ -2,10 +2,11 @@ package br.com.judev.register.Service;
 
 import java.util.List;
 
+import br.com.judev.register.domain.person.Pessoa;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.judev.register.Repository.EnderecoRepository;
+import br.com.judev.register.repository.EnderecoRepository;
 import br.com.judev.register.domain.Endereco.Endereco;
 
 @Service
@@ -45,5 +46,13 @@ public class EnderecoService {
             throw new IllegalArgumentException("O estado é obrigatório.");
         }
     }
+
+    public Endereco buscarPorId(Long id) {
+        Endereco endereco = enderecoRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("Endereco com ID " + id + " não encontrada."));
+        validarDadosObrigatoriosEnderecos(endereco);
+        return endereco;
+    }
+
 
 }

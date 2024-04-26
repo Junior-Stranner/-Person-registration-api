@@ -1,15 +1,12 @@
-package br.com.judev.register.Controller;
+package br.com.judev.register.controller;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import br.com.judev.register.Service.PessoaService;
 import br.com.judev.register.domain.person.Pessoa;
@@ -44,10 +41,9 @@ public class PessoaController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = Pessoa.class)))
     })
     @PostMapping(produces = { MediaType.APPLICATION_JSON_VALUE })//Swagger exige isso  "produces = MediaType.APPLICATION_JSON_VALUE"
-    public ResponseEntity<Pessoa> criar(@RequestBody Pessoa pessoa){
-        Pessoa novaPessoa = pessoaService.salvarPessoa(pessoa);
+    public Pessoa criar(@RequestBody Pessoa pessoa){
         System.out.println("Salvando Pessoa !");
-        return ResponseEntity.status(HttpStatus.CREATED).body(novaPessoa);
+        return  pessoaService.salvarPessoa(pessoa);
 
 
     }
@@ -61,8 +57,20 @@ public class PessoaController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = Pessoa.class)))
     })
     @GetMapping(produces = { MediaType.APPLICATION_JSON_VALUE })//Swagger exige isso  "produces = MediaType.APPLICATION_JSON_VALUE"
-    public ResponseEntity<List<Pessoa>> listarTodos(){
-        List<Pessoa> pessoas = pessoaService.listar();
-        return ResponseEntity.ok(pessoas);
+    public List<Pessoa> listarTodos(){
+        return pessoaService.listar();
+    }
+
+    @Operation(summary = "Localizar um cliente", description = "Recurso para localizar uma Pessoa pelo ID. " ,
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Recurso localizado com sucesso",
+                            content = @Content(mediaType = " application/json;charset=UTF-8", schema = @Schema(implementation = Pessoa.class))),
+                    @ApiResponse(responseCode = "404", description = "Pessoa não encontrado",
+                            content = @Content(mediaType = " application/json;charset=UTF-8", schema = @Schema(implementation = Pessoa.class))),
+            })
+    @GetMapping(value = "/{id}")  // Define um endpoint para obter uma pessoa pelo ID
+    public Pessoa buscarPorId(@PathVariable Long id) {
+        return pessoaService.buscarPorId(id); // Retorna HTTP 200 se a pessoa for encontrada
+
     }
 }

@@ -1,4 +1,4 @@
-package br.com.judev.register.Repository;
+package br.com.judev.register.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
