@@ -45,8 +45,11 @@ public class PessoaController {
     })
     @PostMapping(produces = { MediaType.APPLICATION_JSON_VALUE })//Swagger exige isso  "produces = MediaType.APPLICATION_JSON_VALUE"
     public ResponseEntity<Pessoa> criar(@RequestBody Pessoa pessoa){
-        return ResponseEntity.status(HttpStatus.CREATED).body(pessoa);
-        
+        Pessoa novaPessoa = pessoaService.salvarPessoa(pessoa);
+        System.out.println("Salvando Pessoa !");
+        return ResponseEntity.status(HttpStatus.CREATED).body(novaPessoa);
+
+
     }
 
     @Operation(summary = "Listar todos as Pessoas cadastrados", description = "mostre a lista de todas as pessoas",
