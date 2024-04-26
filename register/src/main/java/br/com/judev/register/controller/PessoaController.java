@@ -2,7 +2,6 @@ package br.com.judev.register.controller;
 
 import java.util.List;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +15,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 
 @RestController
 @RequestMapping("/api/v1/pessoas")
@@ -61,16 +59,40 @@ public class PessoaController {
         return pessoaService.listar();
     }
 
-    @Operation(summary = "Localizar um cliente", description = "Recurso para localizar uma Pessoa pelo ID. " ,
+    @Operation(summary = "Localizar uma Pessoa", description = "Recurso para localizar uma Pessoa pelo ID. " ,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Recurso localizado com sucesso",
                             content = @Content(mediaType = " application/json;charset=UTF-8", schema = @Schema(implementation = Pessoa.class))),
                     @ApiResponse(responseCode = "404", description = "Pessoa não encontrado",
                             content = @Content(mediaType = " application/json;charset=UTF-8", schema = @Schema(implementation = Pessoa.class))),
             })
-    @GetMapping(value = "/{id}")  // Define um endpoint para obter uma pessoa pelo ID
+    @GetMapping(value = "/{id}",produces = { MediaType.APPLICATION_JSON_VALUE })//Swagger exige isso  "produces = MediaType.APPLICATION_JSON_VALUE")  // Define um endpoint para obter uma pessoa pelo ID
     public Pessoa buscarPorId(@PathVariable Long id) {
-        return pessoaService.buscarPorId(id); // Retorna HTTP 200 se a pessoa for encontrada
+        return pessoaService.buscarPorId(id);
 
+    }
+
+    @Operation(summary = "alterar uma Pessoa", description = "Recurso para localizar uma Pessoa pelo ID. " ,
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Recurso localizado com sucesso",
+                            content = @Content(mediaType = " application/json;charset=UTF-8", schema = @Schema(implementation = Pessoa.class))),
+                    @ApiResponse(responseCode = "404", description = "Pessoa não encontrado",
+                            content = @Content(mediaType = " application/json;charset=UTF-8", schema = @Schema(implementation = Pessoa.class))),
+            })
+    @PutMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
+    public Pessoa alterarPessoa(@RequestBody Pessoa pessoa, @PathVariable Long id) {
+        return pessoaService.alterarPessoa(pessoa, id);
+    }
+
+    @Operation(summary = "alterar uma Pessoa", description = "Recurso para localizar uma Pessoa pelo ID. " ,
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Recurso localizado com sucesso",
+                            content = @Content(mediaType = " application/json;charset=UTF-8", schema = @Schema(implementation = Pessoa.class))),
+                    @ApiResponse(responseCode = "404", description = "Pessoa não encontrado",
+                            content = @Content(mediaType = " application/json;charset=UTF-8", schema = @Schema(implementation = Pessoa.class))),
+            })
+    @DeleteMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
+    public void deletarPessoa(@PathVariable Long id) {
+        pessoaService.deletarPessoa(id); // Chama o serviço para deletar a pessoa;
     }
 }

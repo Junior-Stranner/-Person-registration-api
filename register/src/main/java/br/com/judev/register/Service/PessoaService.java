@@ -1,7 +1,11 @@
 package br.com.judev.register.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,11 +45,33 @@ public class PessoaService {
                 throw new IllegalArgumentException("Endereço é obrigatório");
             }
         }
-
+    @Transactional(readOnly = true)
     public Pessoa buscarPorId(Long id) {
         Pessoa pessoa = pessoaRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("Pessoa com ID " + id + " não encontrada."));
-        validarDadosObrigatorios(pessoa);
+        validarDadosObrigatorios(pessoa); // Verifica se os dados obrigatórios estão completos
         return pessoa;
+    }
+
+    @Transactional
+    public Pessoa alterarPessoa(Pessoa pessoa, Long id) {
+        validarDadosObrigatorios(pessoa); // Confirma que os dados estão corretos antes de alterar
+
+        Pessoa pessoaExistente = pessoaRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("Pessoa com ID " + id + " não encontrada."));
+
+        pessoaExistente.setNomeCompleto(pessoa.getNomeCompleto());
+        pessoaExistente.setDataNascimento(pessoa.getDataNascimento());
+        pessoaExistente.setEndereco(pessoa.getEndereco());
+
+        return pessoaRepository.save(pessoaExistente);
+    }
+
+    @Transactional
+    public void deletarPessoa(Long id) {
+        Pessoa pessoa = pessoaRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("Pessoa com ID " + id + " não encontrada."));
+        validarDadosObrigatorios(pessoa); // Opcional, para verificar se a pessoa tem dados consistentes antes de excluir
+        pessoaRepository.delete(pessoa); // Excluir a pessoa do banco de dados
     }
 }
