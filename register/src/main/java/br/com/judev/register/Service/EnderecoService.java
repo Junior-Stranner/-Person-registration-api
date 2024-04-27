@@ -21,11 +21,9 @@ public class EnderecoService {
         this.pessoaRepository = pessoaRepository;
     }
 
-
     @Transactional(readOnly = true) // Esta anotação indica que o método é apenas de leitura no banco de dados
     public List<Endereco> listar(){
         return enderecoRepository.findAll();
-        
     }
 
     public Endereco salvarEndereco(Endereco endereco) {
@@ -51,52 +49,37 @@ public class EnderecoService {
         }
     }
 
+    // Método para buscar um endereço pelo ID
     public Endereco buscarPorId(Long id) {
+        // Tenta encontrar o endereço pelo ID no repositório
         Endereco endereco = enderecoRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Endereco com ID " + id + " não encontrada."));
+                new IllegalArgumentException("Endereço com ID " + id + " não encontrado.")); // Lança exceção se não encontrar
+
+        // Valida se o endereço possui dados obrigatórios
         validarDadosObrigatoriosEnderecos(endereco);
+
+        // Retorna o endereço encontrado
         return endereco;
     }
 
     @Transactional // Indica que este método modifica o banco de dados
-    public Endereco alterarEndereco(Endereco endereco, Long id, Long pessoaId) {
-        validarDadosObrigatoriosEnderecos(endereco); // Certifica-se de que o endereço tem dados válidos
+    public Endereco alterarEndereco(Endereco endereco, Long id) {
+        // Valida se o endereço a ser alterado possui dados obrigatórios
+        validarDadosObrigatoriosEnderecos(endereco);
 
-        // Busca o endereço existente pelo ID e lança exceção se não for encontrado
-        Endereco enderecoExistente = enderecoRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Endereço com ID " + id + " não encontrado."));
+        // Busca o endereço existente pelo ID no repositório
+        Endereco enderecoExistente = enderecoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Endereço com ID " + id + " não encontrado.")); // Se não encontrar, lança exceção
 
-        // Se o ID da pessoa for fornecido, busca no repositório e lança exceção se não for encontrada
-        if (pessoaId != null) {
-            Pessoa pessoaExistente = pessoaRepository.findById(pessoaId).orElseThrow(() ->
-                    new IllegalArgumentException("Pessoa com ID " + pessoaId + " não encontrada."));
-            enderecoExistente.setPessoa(pessoaExistente);
-        }
-        // Atualiza os campos do endereço com os novos dados
-        enderecoExistente.setLogradouro(endereco.getLogradouro());
-        enderecoExistente.setCep(endereco.getCep());
-        enderecoExistente.setNumero(endereco.getNumero());
-        enderecoExistente.setCidade(endereco.getCidade());
+        // Atualiza os campos do endereço existente com valores do endereço passado como argumento
+        enderecoExistente.setLogradouro(endereco.getLogradouro()); // Atualiza o logradouro
+        enderecoExistente.setCep(endereco.getCep()); // Atualiza o CEP
+        enderecoExistente.setNumero(endereco.getNumero()); // Atualiza o número
+        enderecoExistente.setCidade(endereco.getCidade()); // Atualiza a cidade
 
-        return enderecoRepository.save(enderecoExistente); // Salva as alterações no banco de dados
+        // Salva as alterações no banco de dados
+        return enderecoRepository.save(enderecoExistente); // Retorna o endereço alterado após salvar
     }
-
-    @Transactional // Indica que este método modifica o banco de dados
-    public Endereco alterarPessoaNoEndereco(Long enderecoId, Long pessoaId) {
-        // Busca o endereço pelo ID e lança exceção se não for encontrado
-        Endereco enderecoExistente = enderecoRepository.findById(enderecoId).orElseThrow(() ->
-                new IllegalArgumentException("Endereço com ID " + enderecoId + " não encontrado."));
-
-        // Busca a pessoa pelo ID e lança exceção se não for encontrada
-        Pessoa pessoaExistente = pessoaRepository.findById(pessoaId).orElseThrow(() ->
-                new IllegalArgumentException("Pessoa com ID " + pessoaId + " não encontrada."));
-
-        // Atualiza a pessoa associada ao endereço
-        enderecoExistente.setPessoa(pessoaExistente);
-
-        return enderecoRepository.save(enderecoExistente); // Salva as alterações no banco de dados
-    }
-
 
 
     @Transactional // Indica que este método modifica o banco de dados
