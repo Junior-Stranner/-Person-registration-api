@@ -76,8 +76,8 @@ public class EnderecoController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = Endereco.class))),
             })
     @PutMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE }) // Endpoint para alterar pelo ID
-    public ResponseEntity<Endereco> alterarEndereco(@RequestBody Endereco endereco, @PathVariable Long id) {
-        Endereco enderecoAlterado = enderecoService.alterarEndereco(endereco, id); // Altera o endereço pelo ID
+    public ResponseEntity<Endereco> alterarEndereco(@RequestBody Endereco endereco, @PathVariable Long id, @PathVariable Long pessoaId) {
+        Endereco enderecoAlterado = enderecoService.alterarEndereco(endereco, id , pessoaId); // Altera o endereço pelo ID
         return ResponseEntity.ok(enderecoAlterado); // HTTP 200 para sucesso
     }
 

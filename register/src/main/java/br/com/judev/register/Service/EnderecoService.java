@@ -3,6 +3,7 @@ package br.com.judev.register.Service;
 import java.util.List;
 
 import br.com.judev.register.domain.person.Pessoa;
+import br.com.judev.register.repository.PessoaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,10 +14,13 @@ import br.com.judev.register.domain.Endereco.Endereco;
 public class EnderecoService {
     
     private final EnderecoRepository enderecoRepository;
+    private final PessoaRepository pessoaRepository;
 
-    public EnderecoService(EnderecoRepository enderecoRepository){
+    public EnderecoService(EnderecoRepository enderecoRepository, PessoaRepository pessoaRepository) {
         this.enderecoRepository = enderecoRepository;
+        this.pessoaRepository = pessoaRepository;
     }
+
 
     @Transactional(readOnly = true) // Esta anotação indica que o método é apenas de leitura no banco de dados
     public List<Endereco> listar(){
@@ -55,22 +59,45 @@ public class EnderecoService {
     }
 
     @Transactional // Indica que este método modifica o banco de dados
-    public Endereco alterarEndereco(Endereco endereco, Long id) {
-        validarDadosObrigatoriosEnderecos(endereco); // Certifica-se de que a pessoa tem dados válidos
+    public Endereco alterarEndereco(Endereco endereco, Long id, Long pessoaId) {
+        validarDadosObrigatoriosEnderecos(endereco); // Certifica-se de que o endereço tem dados válidos
 
-        // Busca a pessoa existente pelo ID e lança exceção se não for encontrada
+        // Busca o endereço existente pelo ID e lança exceção se não for encontrado
         Endereco enderecoExistente = enderecoRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Pessoa com ID " + id + " não encontrada."));
+                new IllegalArgumentException("Endereço com ID " + id + " não encontrado."));
 
-        // Atualiza os campos da pessoa existente com os novos dados
-       enderecoExistente.setLogradouro(endereco.getLogradouro());
-       enderecoExistente.setCep(endereco.getCep());
-       enderecoExistente.setNumero(endereco.getNumero());
-       enderecoExistente.setCidade(endereco.getCidade());
-       enderecoExistente.setEstado(endereco.getEstado());
+        // Se o ID da pessoa for fornecido, busca no repositório e lança exceção se não for encontrada
+        if (pessoaId != null) {
+            Pessoa pessoaExistente = pessoaRepository.findById(pessoaId).orElseThrow(() ->
+                    new IllegalArgumentException("Pessoa com ID " + pessoaId + " não encontrada."));
+            enderecoExistente.setPessoa(pessoaExistente);
+        }
+        // Atualiza os campos do endereço com os novos dados
+        enderecoExistente.setLogradouro(endereco.getLogradouro());
+        enderecoExistente.setCep(endereco.getCep());
+        enderecoExistente.setNumero(endereco.getNumero());
+        enderecoExistente.setCidade(endereco.getCidade());
 
         return enderecoRepository.save(enderecoExistente); // Salva as alterações no banco de dados
     }
+
+    @Transactional // Indica que este método modifica o banco de dados
+    public Endereco alterarPessoaNoEndereco(Long enderecoId, Long pessoaId) {
+        // Busca o endereço pelo ID e lança exceção se não for encontrado
+        Endereco enderecoExistente = enderecoRepository.findById(enderecoId).orElseThrow(() ->
+                new IllegalArgumentException("Endereço com ID " + enderecoId + " não encontrado."));
+
+        // Busca a pessoa pelo ID e lança exceção se não for encontrada
+        Pessoa pessoaExistente = pessoaRepository.findById(pessoaId).orElseThrow(() ->
+                new IllegalArgumentException("Pessoa com ID " + pessoaId + " não encontrada."));
+
+        // Atualiza a pessoa associada ao endereço
+        enderecoExistente.setPessoa(pessoaExistente);
+
+        return enderecoRepository.save(enderecoExistente); // Salva as alterações no banco de dados
+    }
+
+
 
     @Transactional // Indica que este método modifica o banco de dados
     public void deletarEndereco(Long id) {
