@@ -1,6 +1,7 @@
 package br.com.judev.register.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import br.com.judev.register.domain.person.Pessoa;
 import br.com.judev.register.repository.PessoaRepository;
@@ -26,10 +27,23 @@ public class EnderecoService {
         return enderecoRepository.findAll();
     }
 
+    @Transactional(readOnly = true) // Esta anotação indica que o método é apenas de leitura no banco de dados
+    public Pessoa buscarPessoaPorId(Long pessoaId) {
+        return pessoaRepository.findById(pessoaId)
+                .orElseThrow(() -> new IllegalArgumentException("Pessoa com ID " + pessoaId + " não encontrada."));
+    }
+    // Exemplo de uso para obter o ID da pessoa e associá-lo ao endereço
     public Endereco salvarEndereco(Endereco endereco) {
-        validarDadosObrigatoriosEnderecos(endereco);
+        // Primeiro, obtenha a pessoa pelo ID
+        Pessoa pessoa = buscarPessoaPorId(endereco.getPessoa().getId());
+
+        // Associe a pessoa ao endereço
+        endereco.setPessoa(pessoa);
+
+        // Agora salve o endereço
         return enderecoRepository.save(endereco);
     }
+
     private void validarDadosObrigatoriosEnderecos(Endereco endereco) {
 
         if (endereco.getLogradouro() == null || endereco.getLogradouro().isBlank()) {
@@ -71,6 +85,11 @@ public class EnderecoService {
         Endereco enderecoExistente = enderecoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Endereço com ID " + id + " não encontrado.")); // Se não encontrar, lança exceção
 
+        // Primeiro, obtenha a pessoa pelo ID
+        Pessoa pessoa = buscarPessoaPorId(endereco.getPessoa().getId());
+        // Associe a pessoa ao endereço
+        endereco.setPessoa(pessoa);
+
         // Atualiza os campos do endereço existente com valores do endereço passado como argumento
         enderecoExistente.setLogradouro(endereco.getLogradouro()); // Atualiza o logradouro
         enderecoExistente.setCep(endereco.getCep()); // Atualiza o CEP
@@ -84,9 +103,9 @@ public class EnderecoService {
 
     @Transactional // Indica que este método modifica o banco de dados
     public void deletarEndereco(Long id) {
-        Endereco endereco = enderecoRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Pessoa com ID " + id +"não encontrada.")); // Lança exceção se o ID não for encontrado
 
+        Endereco  endereco = enderecoRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("Enderecos com ID " + id +"não encontrada.")); // Lança exceção se o ID não for encontrado
         enderecoRepository.delete(endereco); // Exclui a pessoa do banco de dados
     }
 }

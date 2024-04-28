@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import br.com.judev.register.domain.Endereco.Endereco;
+import br.com.judev.register.repository.EnderecoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -16,10 +18,13 @@ import br.com.judev.register.domain.person.Pessoa;
 public class PessoaService {
 
     private final PessoaRepository pessoaRepository; // Repositório para operações no banco de dados
+    private final  EnderecoRepository enderecoRepository;
+
 
     // Construtor do serviço que recebe uma instância do repositório para injeção de dependência
-    public PessoaService(PessoaRepository pessoaRepository) {
+    public PessoaService(PessoaRepository pessoaRepository, EnderecoRepository enderecoRepository) {
         this.pessoaRepository = pessoaRepository;
+        this.enderecoRepository = enderecoRepository;
     }
 
     @Transactional(readOnly = true) // Indica que este método não modifica o banco de dados
@@ -72,9 +77,16 @@ public class PessoaService {
 
     @Transactional // Indica que este método modifica o banco de dados
     public void deletarPessoa(Long id) {
+        // Verifica se a pessoa existe
         Pessoa pessoa = pessoaRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Pessoa com ID " + id +"não encontrada.")); // Lança exceção se o ID não for encontrado
-
-                        pessoaRepository.delete(pessoa); // Exclui a pessoa do banco de dados
+                new IllegalArgumentException("Pessoa com ID " + id + " não encontrada ou já deletada.")); // Lança exceção se não for encontrada
+        // Verifica se há endereços associados à pessoa
+        List<Endereco> enderecos = enderecoRepository.findByPessoaId(id);
+        if (!enderecos.isEmpty()) {
+            throw new IllegalArgumentException("Não é possível deletar a pessoa com ID " + id + ". Ela ainda é referenciada por endereços.");
+        }
+        // Se não houver referências, exclui a pessoa
+        pessoaRepository.delete(pessoa); // Exclui a pessoa do banco de dados
     }
+
 }
