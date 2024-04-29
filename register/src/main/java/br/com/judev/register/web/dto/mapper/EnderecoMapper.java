@@ -1,7 +1,8 @@
-package br.com.judev.register.dto.mapper;
+package br.com.judev.register.web.dto.mapper;
 
 import br.com.judev.register.domain.Endereco.Endereco;
-import br.com.judev.register.dto.EnderecoDto;
+import br.com.judev.register.web.dto.EnderecoDto;
+
 import org.modelmapper.ModelMapper;
 
 import java.util.List;

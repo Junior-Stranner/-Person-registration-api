@@ -1,10 +1,7 @@
-package br.com.judev.register.controller;
+package br.com.judev.register.web.controller;
 
 import java.util.List;
 
-import br.com.judev.register.domain.person.Pessoa;
-import br.com.judev.register.dto.EnderecoDto;
-import br.com.judev.register.dto.mapper.EnderecoMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +9,11 @@ import org.springframework.web.bind.annotation.*;
 
 import br.com.judev.register.Service.EnderecoService;
 import br.com.judev.register.domain.Endereco.Endereco;
+import br.com.judev.register.web.dto.EnderecoDto;
+import br.com.judev.register.web.dto.mapper.EnderecoMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -22,13 +22,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 @RestController // Indica que este é um controlador REST
 @RequestMapping("/api/v1/enderecos") // Define a base do endpoint
 @Tag(name = "Endereços", description = "Endpoints para manipular endereços") // Anotação para Swagger/OpenAPI
+@RequiredArgsConstructor
 public class EnderecoController {
 
     private final EnderecoService enderecoService; // Injeção do serviço de endereços
 
-    public EnderecoController(EnderecoService enderecoService) {
-        this.enderecoService = enderecoService; // Inicializa o serviço
-    }
+   
 
     @Operation(summary = "Criar um novo endereço", description = "Endpoint para criar um novo endereço",
             responses = {

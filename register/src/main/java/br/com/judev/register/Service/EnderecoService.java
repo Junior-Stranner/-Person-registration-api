@@ -1,11 +1,13 @@
 package br.com.judev.register.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 import br.com.judev.register.domain.person.Pessoa;
-import br.com.judev.register.dto.EnderecoDto;
 import br.com.judev.register.repository.PessoaRepository;
+import br.com.judev.register.web.dto.EnderecoDto;
+import br.com.judev.register.web.exeption.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,15 +15,12 @@ import br.com.judev.register.repository.EnderecoRepository;
 import br.com.judev.register.domain.Endereco.Endereco;
 
 @Service
+@RequiredArgsConstructor
 public class EnderecoService {
     
     private final EnderecoRepository enderecoRepository;
     private final PessoaRepository pessoaRepository;
 
-    public EnderecoService(EnderecoRepository enderecoRepository, PessoaRepository pessoaRepository) {
-        this.enderecoRepository = enderecoRepository;
-        this.pessoaRepository = pessoaRepository;
-    }
 
     @Transactional(readOnly = true) // Esta anotação indica que o método é apenas de leitura no banco de dados
     public List<Endereco> listar(){
@@ -31,10 +30,12 @@ public class EnderecoService {
     @Transactional(readOnly = true) // Esta anotação indica que o método é apenas de leitura no banco de dados
     public Pessoa buscarPessoaPorId(Long pessoaId) {
         return pessoaRepository.findById(pessoaId)
-                .orElseThrow(() -> new IllegalArgumentException("Pessoa com ID " + pessoaId + " não encontrada."));
+                .orElseThrow(() -> new EntityNotFoundException("Pessoa com ID " + pessoaId + " não encontrada."));
     }
     // Exemplo de uso para obter o ID da pessoa e associá-lo ao endereço
     public Endereco salvarEndereco(Endereco endereco) {
+
+        validarDadosObrigatoriosEnderecos(endereco);
         // Primeiro, obtenha a pessoa pelo ID
           Pessoa pessoa = buscarPessoaPorId(endereco.getPessoa().getId());
         // Associe a pessoa ao endereço
@@ -66,11 +67,9 @@ public class EnderecoService {
     public Endereco buscarPorId(Long id) {
         // Tenta encontrar o endereço pelo ID no repositório
         Endereco endereco = enderecoRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Endereço com ID " + id + " não encontrado.")); // Lança exceção se não encontrar
-
+                new EntityNotFoundException("Endereço com ID " + id + " não encontrado.")); // Lança exceção se não encontrar
         // Valida se o endereço possui dados obrigatórios
         validarDadosObrigatoriosEnderecos(endereco);
-
         // Retorna o endereço encontrado
         return endereco;
     }
@@ -80,15 +79,15 @@ public class EnderecoService {
 
         // Busca o endereço existente pelo ID no repositório
         Endereco enderecoExistente = enderecoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Endereço com ID " + id + " não encontrado.")); // Se não encontrar, lança exceção
+                .orElseThrow(() -> new EntityNotFoundException("Endereço com ID " + id + " não encontrado.")); // Se não encontrar, lança exceção
+
+         // Valida se o endereço a ser alterado possui dados obrigatórios=
+        validarDadosObrigatoriosEnderecos(enderecoExistente);
 
         // Primeiro, obtenha a pessoa pelo ID
         Pessoa pessoa = pessoaRepository.findById(enderecoExistente.getPessoa().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Pessoa não encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Pessoa não encontrada"));
         enderecoExistente.setPessoa(pessoa);
-
-        // Valida se o endereço a ser alterado possui dados obrigatórios=
-        validarDadosObrigatoriosEnderecos(enderecoExistente);
 
         // Atualiza campos com base no DTO
         enderecoExistente.setLogradouro(dto.getLogradouro());
@@ -106,7 +105,7 @@ public class EnderecoService {
     public void deletarEndereco(Long id) {
 
         Endereco  endereco = enderecoRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Enderecos com ID " + id +"não encontrada.")); // Lança exceção se o ID não for encontrado
+                new EntityNotFoundException("Enderecos com ID " + id +"não encontrada.")); // Lança exceção se o ID não for encontrado
         enderecoRepository.delete(endereco); // Exclui a pessoa do banco de dados
     }
 }

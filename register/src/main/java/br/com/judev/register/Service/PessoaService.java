@@ -1,20 +1,19 @@
 package br.com.judev.register.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import br.com.judev.register.domain.Endereco.Endereco;
 import br.com.judev.register.repository.EnderecoRepository;
-import jakarta.persistence.EntityNotFoundException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.judev.register.repository.PessoaRepository;
+import br.com.judev.register.web.exeption.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import br.com.judev.register.domain.person.Pessoa;
 
 @Service // Anotação para indicar que esta classe é um serviço gerenciado pelo Spring
+@RequiredArgsConstructor
 public class PessoaService {
 
     private final PessoaRepository pessoaRepository; // Repositório para operações no banco de dados
@@ -22,10 +21,7 @@ public class PessoaService {
 
 
     // Construtor do serviço que recebe uma instância do repositório para injeção de dependência
-    public PessoaService(PessoaRepository pessoaRepository, EnderecoRepository enderecoRepository) {
-        this.pessoaRepository = pessoaRepository;
-        this.enderecoRepository = enderecoRepository;
-    }
+   
 
     @Transactional(readOnly = true) // Indica que este método não modifica o banco de dados
     public List<Pessoa> listar() {
@@ -51,18 +47,18 @@ public class PessoaService {
     @Transactional(readOnly = true) // Indica que o método é apenas para leitura, sem modificação do banco de dados
     public Pessoa buscarPorId(Long id) {
         Pessoa pessoa = pessoaRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Pessoa com ID " + id + " não encontrada.")); // Lança exceção se o ID não for encontrado
-        validarDadosObrigatorios(pessoa); // Verifica se a pessoa tem campos obrigatórios preenchidos
+                new EntityNotFoundException("Pessoa com ID " + id + " não encontrada.")); // Lança exceção se o ID não for encontrado
         return pessoa; // Retorna a pessoa encontrada
     }
 
     @Transactional // Indica que este método modifica o banco de dados
     public Pessoa alterarPessoa(Pessoa pessoa, Long id) {
-        validarDadosObrigatorios(pessoa); // Certifica-se de que a pessoa tem dados válidos
 
         // Busca a pessoa existente pelo ID e lança exceção se não for encontrada
         Pessoa pessoaExistente = pessoaRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Pessoa com ID " + id + " não encontrada."));
+                new EntityNotFoundException("Pessoa com ID " + id + " não encontrada."));
+
+             validarDadosObrigatorios(pessoa); // Certifica-se de que a pessoa tem dados válidos
 
         // Atualiza os campos da pessoa existente com os novos dados
         pessoaExistente.setNomeCompleto(pessoa.getNomeCompleto());
@@ -75,11 +71,11 @@ public class PessoaService {
     public void deletarPessoa(Long id) {
         // Verifica se a pessoa existe
         Pessoa pessoa = pessoaRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Pessoa com ID " + id + " não encontrada ou já deletada.")); // Lança exceção se não for encontrada
+                new EntityNotFoundException("Pessoa com ID " + id + " não encontrada ou já deletada.")); // Lança exceção se não for encontrada
         // Verifica se há endereços associados à pessoa
         List<Endereco> enderecos = enderecoRepository.findByPessoaId(id);
         if (!enderecos.isEmpty()) {
-            throw new IllegalArgumentException("Não é possível deletar a pessoa com ID " + id + ". Ela ainda é referenciada por endereços.");
+            throw new EntityNotFoundException("Não é possível deletar a pessoa com ID " + id + ". Ela ainda é referenciada por endereços.");
         }
         // Se não houver referências, exclui a pessoa
         pessoaRepository.delete(pessoa); // Exclui a pessoa do banco de dados

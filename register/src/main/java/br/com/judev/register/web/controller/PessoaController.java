@@ -1,4 +1,4 @@
-package br.com.judev.register.controller;
+package br.com.judev.register.web.controller;
 
 import java.util.List;
 
@@ -15,17 +15,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
 @RestController // Define este controlador como um controlador RESTful
 @RequestMapping("/api/v1/pessoas") // Define a base para os endpoints
 @Tag(name = "Persons", description = "endpoints for managing persons")
+@RequiredArgsConstructor
 public class PessoaController {
 
     private final PessoaService pessoaService; // Injeção de dependência do serviço de pessoas
 
-    public PessoaController(PessoaService pessoaService) {
-        this.pessoaService = pessoaService; // Inicializa o serviço
-    }
+ 
 
     @Operation(summary = "Criar uma nova pessoa", description = "Endpoint para criar uma nova pessoa",
             responses = {

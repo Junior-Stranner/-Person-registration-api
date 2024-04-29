@@ -1,4 +1,4 @@
-package br.com.judev.register.dto;
+package br.com.judev.register.web.dto;
 
 import br.com.judev.register.domain.person.Pessoa;
 
