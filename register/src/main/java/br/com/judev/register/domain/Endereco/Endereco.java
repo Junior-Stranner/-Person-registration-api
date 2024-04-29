@@ -23,10 +23,9 @@ public class Endereco {
     private String estado;
 
     @ManyToOne
-    @JoinColumn(name = "id_pessoa ", nullable = false)
-    private Pessoa pessoa;
+    @JoinColumn(name = "pessoa_id") // Use o nome da coluna para associação
+    private Pessoa pessoa; // Relacionamento com Pessoa
 
-    
     public Endereco(String logradouro, String cep, int numero, String cidade, String estado, Pessoa pessoa) {
         this.logradouro = logradouro;
         this.cep = cep;

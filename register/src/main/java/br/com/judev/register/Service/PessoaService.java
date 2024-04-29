@@ -46,9 +46,6 @@ public class PessoaService {
         if (pessoa.getDataNascimento() == null) {
             throw new IllegalArgumentException("A data de nascimento é obrigatória."); // Lança exceção se a data de nascimento estiver ausente
         }
-        if (pessoa.getEndereco() == null || pessoa.getEndereco().isBlank()) {
-            throw new IllegalArgumentException("Endereço é obrigatório."); // Lança exceção se o endereço estiver ausente ou vazio
-        }
     }
 
     @Transactional(readOnly = true) // Indica que o método é apenas para leitura, sem modificação do banco de dados
@@ -70,7 +67,6 @@ public class PessoaService {
         // Atualiza os campos da pessoa existente com os novos dados
         pessoaExistente.setNomeCompleto(pessoa.getNomeCompleto());
         pessoaExistente.setDataNascimento(pessoa.getDataNascimento());
-        pessoaExistente.setEndereco(pessoa.getEndereco());
 
         return pessoaRepository.save(pessoaExistente); // Salva as alterações no banco de dados
     }

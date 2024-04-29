@@ -3,6 +3,8 @@ package br.com.judev.register.controller;
 import java.util.List;
 
 import br.com.judev.register.domain.person.Pessoa;
+import br.com.judev.register.dto.EnderecoDto;
+import br.com.judev.register.dto.mapper.EnderecoMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,9 +40,9 @@ public class EnderecoController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = Endereco.class)))
             })
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE) // Define que o endpoint consome e produz JSON
-    public ResponseEntity<Endereco> criar(@RequestBody Endereco endereco) {
-        Endereco novoEndereco = enderecoService.salvarEndereco(endereco); // Salva um novo endereço
-        return ResponseEntity.status(HttpStatus.CREATED).body(novoEndereco); // Retorna HTTP 201 para sucesso
+    public ResponseEntity<EnderecoDto> criar(@RequestBody EnderecoDto dto ) {
+        Endereco novoEndereco = enderecoService.salvarEndereco(EnderecoMapper.toEndereco(dto)); // Salva um novo endereço
+        return ResponseEntity.status(HttpStatus.CREATED).body(EnderecoMapper.ToDto(novoEndereco)); // Retorna HTTP 201 para sucesso
     }
 
     @Operation(summary = "Listar todos os endereços cadastrados", description = "Lista todos os endereços cadastrados",
@@ -50,9 +52,9 @@ public class EnderecoController {
                                     array = @ArraySchema(schema = @Schema(implementation = Endereco.class))))
             })
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE) // Endpoint para listar todos os endereços
-    public ResponseEntity<List<Endereco>> listarTodos() {
+    public ResponseEntity<List<EnderecoDto>> listarTodos() {
         List<Endereco> enderecos = enderecoService.listar(); // Retorna todos os endereços do banco de dados
-        return ResponseEntity.ok(enderecos); // HTTP 200 para resposta bem-sucedida
+        return ResponseEntity.ok(EnderecoMapper.toListDto(enderecos)); // HTTP 200 para resposta bem-sucedida
     }
 
     @Operation(summary = "Buscar um endereço pelo ID", description = "Endpoint para buscar um endereço pelo ID",
@@ -76,9 +78,9 @@ public class EnderecoController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = Endereco.class))),
             })
     @PutMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE }) // Endpoint para alterar pelo ID
-    public ResponseEntity<Endereco> alterarEndereco(@RequestBody Endereco endereco,@PathVariable Long id) {
-        Endereco enderecoAlterado = enderecoService.alterarEndereco(endereco , id); // Altera o endereço pelo ID
-        return ResponseEntity.ok(enderecoAlterado); // HTTP 200 para sucesso
+    public ResponseEntity<EnderecoDto> alterarEndereco(@RequestBody EnderecoDto dto, @PathVariable Long id ) {
+        Endereco enderecoAlterado = enderecoService.alterarEndereco(dto,id); // Altera o endereço pelo ID
+        return ResponseEntity.ok(EnderecoMapper.ToDto(enderecoAlterado)); // HTTP 200 para sucesso
     }
 
     @Operation(summary = "Deletar um endereço", description = "Endpoint para deletar um endereço pelo ID",

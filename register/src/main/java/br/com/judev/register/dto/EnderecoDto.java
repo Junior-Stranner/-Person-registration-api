@@ -1,12 +1,15 @@
 package br.com.judev.register.dto;
 
-public class AlterarEnderecoDto {
+import br.com.judev.register.domain.person.Pessoa;
+
+public class EnderecoDto {
     private Long id; // ID do endereço
-    private Long pessoaId; // ID da pessoa associada
+    private Pessoa Pessoa; // ID da pessoa associada
     private String logradouro;
     private String cep;
-    private String numero;
+    private int numero;
     private String cidade;
+    private String estado;
 
     // Getters e Setters
     public Long getId() {
@@ -17,12 +20,12 @@ public class AlterarEnderecoDto {
         this.id = id;
     }
 
-    public Long getPessoaId() {
-        return pessoaId;
+    public br.com.judev.register.domain.person.Pessoa getPessoa() {
+        return Pessoa;
     }
 
-    public void setPessoaId(Long pessoaId) {
-        this.pessoaId = pessoaId;
+    public void setPessoa(br.com.judev.register.domain.person.Pessoa pessoa) {
+        Pessoa = pessoa;
     }
 
     public String getLogradouro() {
@@ -41,11 +44,11 @@ public class AlterarEnderecoDto {
         this.cep = cep;
     }
 
-    public String getNumero() {
+    public int getNumero() {
         return numero;
     }
 
-    public void setNumero(String numero) {
+    public void setNumero(int numero) {
         this.numero = numero;
     }
 
@@ -55,6 +58,14 @@ public class AlterarEnderecoDto {
 
     public void setCidade(String cidade) {
         this.cidade = cidade;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }
 

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import br.com.judev.register.domain.person.Pessoa;
+import br.com.judev.register.dto.EnderecoDto;
 import br.com.judev.register.repository.PessoaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,11 +36,9 @@ public class EnderecoService {
     // Exemplo de uso para obter o ID da pessoa e associá-lo ao endereço
     public Endereco salvarEndereco(Endereco endereco) {
         // Primeiro, obtenha a pessoa pelo ID
-        Pessoa pessoa = buscarPessoaPorId(endereco.getPessoa().getId());
-
+          Pessoa pessoa = buscarPessoaPorId(endereco.getPessoa().getId());
         // Associe a pessoa ao endereço
-        endereco.setPessoa(pessoa);
-
+         endereco.setPessoa(pessoa);
         // Agora salve o endereço
         return enderecoRepository.save(endereco);
     }
@@ -77,29 +76,31 @@ public class EnderecoService {
     }
 
     @Transactional // Indica que este método modifica o banco de dados
-    public Endereco alterarEndereco(Endereco endereco, Long id) {
-        // Valida se o endereço a ser alterado possui dados obrigatórios
-        validarDadosObrigatoriosEnderecos(endereco);
+    public Endereco alterarEndereco(EnderecoDto dto, Long id ) {
 
         // Busca o endereço existente pelo ID no repositório
         Endereco enderecoExistente = enderecoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Endereço com ID " + id + " não encontrado.")); // Se não encontrar, lança exceção
 
         // Primeiro, obtenha a pessoa pelo ID
-        Pessoa pessoa = buscarPessoaPorId(endereco.getPessoa().getId());
-        // Associe a pessoa ao endereço
-        endereco.setPessoa(pessoa);
+        Pessoa pessoa = pessoaRepository.findById(enderecoExistente.getPessoa().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Pessoa não encontrada"));
+        enderecoExistente.setPessoa(pessoa);
 
-        // Atualiza os campos do endereço existente com valores do endereço passado como argumento
-        enderecoExistente.setLogradouro(endereco.getLogradouro()); // Atualiza o logradouro
-        enderecoExistente.setCep(endereco.getCep()); // Atualiza o CEP
-        enderecoExistente.setNumero(endereco.getNumero()); // Atualiza o número
-        enderecoExistente.setCidade(endereco.getCidade()); // Atualiza a cidade
+        // Valida se o endereço a ser alterado possui dados obrigatórios=
+        validarDadosObrigatoriosEnderecos(enderecoExistente);
 
-        // Salva as alterações no banco de dados
-        return enderecoRepository.save(enderecoExistente); // Retorna o endereço alterado após salvar
+        // Atualiza campos com base no DTO
+        enderecoExistente.setLogradouro(dto.getLogradouro());
+        enderecoExistente.setCep(dto.getCep());
+        enderecoExistente.setNumero(dto.getNumero());
+        enderecoExistente.setCidade(dto.getCidade());
+        enderecoExistente.setEstado(dto.getEstado());
+        enderecoExistente.setPessoa(dto.getPessoa());
+        // Atualiza outras propriedades conforme necessário
+
+        return enderecoRepository.save(enderecoExistente); // Salva as alterações
     }
-
 
     @Transactional // Indica que este método modifica o banco de dados
     public void deletarEndereco(Long id) {

@@ -4,12 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import br.com.judev.register.domain.Endereco.Endereco;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name="pessoas")
@@ -20,18 +15,14 @@ public class Pessoa {
     private long id;
     private String nomeCompleto;
     private LocalDate dataNascimento;
-    private String endereco;
-  
 
-    @OneToMany(mappedBy = "pessoa")
-    private List<Endereco> enderecos;
-    
+  /*  @OneToMany(mappedBy = "pessoa") // Indica o lado inverso do relacionamento
+    private List<Endereco> enderecos; // Uma lista de endereços*/
 
-    public Pessoa(String nomeCompleto, LocalDate dataNascimento, String endereco, List<Endereco> enderecos) {
+
+    public Pessoa(String nomeCompleto, LocalDate dataNascimento, String endereco) {
         this.nomeCompleto = nomeCompleto;
         this.dataNascimento = dataNascimento;
-        this.endereco = endereco;
-        this.enderecos = enderecos;
     }
 
     public Pessoa() {
@@ -56,22 +47,5 @@ public class Pessoa {
     public void setDataNascimento(LocalDate dataNascimento) {
         this.dataNascimento = dataNascimento;
     }
-
-    public String getEndereco() {
-        return endereco;
-    }
-
-    public void setEndereco(String endereco) {
-        this.endereco = endereco;
-    }
-
-    public List<Endereco> getEnderecos() {
-        return enderecos;
-    }
-
-    public void setEnderecos(List<Endereco> enderecos) {
-        this.enderecos = enderecos;
-    }
-    
 
 }
